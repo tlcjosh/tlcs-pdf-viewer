@@ -174,10 +174,13 @@ function applySpreadParam(AppOptions) {
   if (["none", "off", "single", "0"].includes(spread)) mode = 0;
   else if (["odd", "1"].includes(spread)) mode = 1;
   else if (["even", "2"].includes(spread)) mode = 2;
-
   if (mode === null) return;
+
+  // IMPORTANT: ensure the URL param wins over stored preferences.
+  AppOptions.set("disablePreferences", true);
   AppOptions.set("spreadModeOnLoad", mode);
 }
+
 
 function scrollIntoView(element, spot, scrollMatches = false) {
   let parent = element.offsetParent;

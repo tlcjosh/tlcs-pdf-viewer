@@ -1,28 +1,33 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>PDF Viewer</title>
-    <style>
-      html, body { height: 100%; margin: 0; }
-      iframe { border: 0; width: 100%; height: 100%; }
-    </style>
-  </head>
-  <body>
-    <iframe id="f" allow="fullscreen"></iframe>
-    <script>
-      // Usage: viewer.html?file=https://example.com/something.pdf
-      const params = new URLSearchParams(location.search);
-      const file = params.get("file");
-      if (!file) {
-        document.body.innerText = "Missing ?file=PDF_URL";
-      } else {
-        // Forward to the PDF.js full viewer
-        const url = new URL("./web/viewer.html", location.href);
-        url.searchParams.set("file", file);
-        document.getElementById("f").src = url.toString();
-      }
-    </script>
-  </body>
-</html>
+<script>
+  const params = new URLSearchParams(location.search);
+
+  // Priority:
+  // 1) doc= (assumes /pdf/<doc>)
+  // 2) file= (absolute URL or root-relative path)
+  const doc = params.get("doc");
+  const fileParam = params.get("file");
+
+  let file = null;
+
+  if (doc) {
+    // Allow doc to include subfolders like "reports/AnnualReport2025.pdf" if you want.
+    file = `pdf/${doc}`;
+  } else if (fileParam) {
+    file = fileParam;
+  }
+
+  if (!file) {
+    document.body.innerText = "Missing ?doc=FILENAME.pdf or ?file=PDF_URL";
+  } else {
+    const viewerURL = new URL("./web/viewer.html", location.href);
+
+    // Make the PDF URL absolute against the *site root* (works for absolute URLs too).
+    // Examples:
+    // - "pdf/AnnualReport2025.pdf" -> https://.../pdf/AnnualReport2025.pdf
+    // - "https://..." -> https://...
+    const fileURL = new URL(file, location.href).toString();
+
+    viewerURL.searchParams.set("file", fileURL);
+    document.getElementById("f").src = viewerURL.toString();
+  }
+</script>

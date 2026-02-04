@@ -43,11 +43,18 @@
         }
 
         const viewerURL = new URL("./web/viewer.html", location.href);
-
-        // Resolve relative file paths against *this site*, keep absolute URLs intact.
         const fileURL = new URL(file, location.href).toString();
-
         viewerURL.searchParams.set("file", fileURL);
+        
+        // Optional: forward spread control into PDF.js viewer
+        // allowed: none | odd | even
+        const spread = params.get("spread");
+        if (spread) viewerURL.searchParams.set("spread", spread);
+        
+        // Optional: forward initial page number if you want it later
+        const page = params.get("page");
+        if (page) viewerURL.searchParams.set("page", page);
+        
         iframe.src = viewerURL.toString();
       })();
     </script>

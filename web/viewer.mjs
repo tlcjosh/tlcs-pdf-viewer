@@ -164,6 +164,21 @@ const CursorTool = {
   ZOOM: 2
 };
 const AutoPrintRegExp = /\bprint\s*\(/;
+function applySpreadParam(AppOptions) {
+  const params = new URLSearchParams(window.location.search);
+  const spread = (params.get("spread") || "").toLowerCase();
+  if (!spread) return;
+
+  // PDF.js spread modes: 0 = no spread, 1 = odd spreads (cover then spreads), 2 = even spreads
+  let mode = null;
+  if (["none", "off", "single", "0"].includes(spread)) mode = 0;
+  else if (["odd", "1"].includes(spread)) mode = 1;
+  else if (["even", "2"].includes(spread)) mode = 2;
+
+  if (mode === null) return;
+  AppOptions.set("spreadModeOnLoad", mode);
+}
+
 function scrollIntoView(element, spot, scrollMatches = false) {
   let parent = element.offsetParent;
   if (!parent) {
@@ -19366,6 +19381,7 @@ function webViewerLoad() {
     console.error("webviewerloaded:", ex);
     document.dispatchEvent(event);
   }
+  applySpreadParam(AppOptions);
   PDFViewerApplication.run(config);
 }
 document.blockUnblockOnload?.(true);

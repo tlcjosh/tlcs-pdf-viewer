@@ -4523,7 +4523,8 @@ const defaultOptions = {
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE
   },
   spreadModeOnLoad: {
-    value: -1,
+    /*value: -1,*/
+ 	value:	1,
     kind: OptionKind.VIEWER + OptionKind.PREFERENCE
   },
   textLayerMode: {

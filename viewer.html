@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PDF Viewer</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      iframe { border: 0; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <iframe id="f" allow="fullscreen"></iframe>
+    <script>
+      // Usage: viewer.html?file=https://example.com/something.pdf
+      const params = new URLSearchParams(location.search);
+      const file = params.get("file");
+      if (!file) {
+        document.body.innerText = "Missing ?file=PDF_URL";
+      } else {
+        // Forward to the PDF.js full viewer
+        const url = new URL("./web/viewer.html", location.href);
+        url.searchParams.set("file", file);
+        document.getElementById("f").src = url.toString();
+      }
+    </script>
+  </body>
+</html>

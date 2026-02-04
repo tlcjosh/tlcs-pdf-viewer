@@ -1,33 +1,55 @@
-<script>
-  const params = new URLSearchParams(location.search);
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PDF Viewer</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      iframe { border: 0; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <iframe id="f" allow="fullscreen"></iframe>
 
-  // Priority:
-  // 1) doc= (assumes /pdf/<doc>)
-  // 2) file= (absolute URL or root-relative path)
-  const doc = params.get("doc");
-  const fileParam = params.get("file");
+    <script>
+      (function () {
+        const iframe = document.getElementById("f");
+        if (!iframe) {
+          // Should never happen, but avoids hard crashes.
+          document.body.innerText = "Viewer iframe not found.";
+          return;
+        }
 
-  let file = null;
+        const params = new URLSearchParams(location.search);
 
-  if (doc) {
-    // Allow doc to include subfolders like "reports/AnnualReport2025.pdf" if you want.
-    file = `pdf/${doc}`;
-  } else if (fileParam) {
-    file = fileParam;
-  }
+        // Priority:
+        // 1) doc= (assumes /pdf/<doc>)
+        // 2) file= (absolute URL or root-relative path)
+        const doc = params.get("doc");
+        const fileParam = params.get("file");
 
-  if (!file) {
-    document.body.innerText = "Missing ?doc=FILENAME.pdf or ?file=PDF_URL";
-  } else {
-    const viewerURL = new URL("./web/viewer.html", location.href);
+        let file = null;
 
-    // Make the PDF URL absolute against the *site root* (works for absolute URLs too).
-    // Examples:
-    // - "pdf/AnnualReport2025.pdf" -> https://.../pdf/AnnualReport2025.pdf
-    // - "https://..." -> https://...
-    const fileURL = new URL(file, location.href).toString();
+        if (doc) {
+          file = `pdf/${doc}`;
+        } else if (fileParam) {
+          file = fileParam;
+        }
 
-    viewerURL.searchParams.set("file", fileURL);
-    document.getElementById("f").src = viewerURL.toString();
-  }
-</script>
+        if (!file) {
+          document.body.innerText = "Missing ?doc=FILENAME.pdf or ?file=PDF_URL";
+          return;
+        }
+
+        const viewerURL = new URL("./web/viewer.html", location.href);
+
+        // Resolve relative file paths against *this site*, keep absolute URLs intact.
+        const fileURL = new URL(file, location.href).toString();
+
+        viewerURL.searchParams.set("file", fileURL);
+        iframe.src = viewerURL.toString();
+      })();
+    </script>
+  </body>
+</html>
